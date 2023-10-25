@@ -1,0 +1,274 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Order Management Application</title>
+    <!-- Add Bootstrap CSS link -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Lato', sans-serif;
+
+        }
+
+        body {
+            background: url(images/img3.jpg) no-repeat center center/cover;
+        }
+
+        .container {
+            height: 695px;
+            width: 1095px;
+            margin-top: 35px;
+            
+        }
+        h1 {
+            margin-bottom: 70px;
+        }
+        .form-control {
+            width: 70%;
+        }
+        label,
+        h4,
+        h1,
+        h2,
+        li {
+            color: white;
+        }
+        .formlabel {
+            margin-left: 10px;
+        }
+        input {
+            width: 50px;
+            margin-left: 10px;
+            margin-right: 10px;
+            height: 60%;
+            margin-bottom: 15px;
+        }
+        .table,
+        h2,
+        h4,
+        h1 {
+            text-align: center;
+        }
+        .table {
+            margin-top: 10px;
+        }
+        .item {
+            border-bottom: 1px solid white;
+        }
+        .button {
+            background-color: black;
+            border: 2px solid gray;
+        }
+        .button:hover {
+            background-color: gray;
+            border: 2px solid black;
+            color: black;
+        }
+        .heading {
+            height: 7%;
+            width: 60%;
+            margin-top: 2px;
+            background-color: black;
+            border: 4px solid gray;
+            border-radius: 10px;
+            margin-left: 6%;
+        }
+        .order {
+            height: 8%;
+            width: 40%;
+            background-color: black;
+            border: 4px solid gray;
+            border-radius: 10px;
+            margin-left: 30%;
+            margin-bottom: 40px;
+            
+        }
+        .info {
+            margin-top: 50px;
+            margin-bottom: 30px;
+            text-align: left;
+            margin-left: 35px;   
+        }
+        .submitbutton {
+            margin-top: 20px;
+        }
+        .listyling {
+            background-color: black;
+            /* border: 3px solid gray; */
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+        .spanitem {
+            margin-bottom: 10px;
+            margin-left: 10px;
+            
+        }
+
+
+    </style>
+</head>
+
+<body>
+
+    <div class="container text-left">
+        <h1>Restaurant Orders page</h1>
+        <div class="row justify-content-between">
+            <!-- Form Section -->
+            <div class="col-md-6">
+                <div class="mt-4 form">
+
+                        <h2 class="mt-4 heading">Enter Orders</h2>
+
+                    <h4 class="info">Enter customer's choice dish:</h4>
+                    <form id="form" onsubmit="saveToDatabase(event)">
+
+                        <!-- Your form elements here -->
+                        <div class="form-group">
+                            <label for="price" class="form-label formlabel">Dish Price:</label>
+                            <input type="number" name="price" id="price" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="dish" class="form-label formlabel">Choose Dish:</label>
+                            <input type="text" id="dish" name="dish" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="table" class="form-label formlabel">Choose Table:</label>
+                            <select name="table" class="form-select form-control formlabel">
+                                <option value="Table 1" class="item">Table 1</option>
+                                <option value="Table 2" class="item">Table 2</option>
+                                <option value="Table 3" class="item">Table 3</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary formlabel button submitbutton">Add Dish</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Orders List Section -->
+            <div class="col-md-6">
+                <div class="mt-4 liItems">
+                        <h2 class="order">Orders List</h2>
+                    <div class="row">
+                        <div>
+                            <label for="table1" class="table">
+                                <h4>Table 1</h4>
+                            </label>
+                            <ul id="list1"></ul>
+                        </div>
+                        <div>
+                            <label for="table2" class="table">
+                                <h4>Table 2</h4>
+                            </label>
+                            <ul id="list2"></ul>
+                        </div>
+                        <div>
+                            <label for="table3" class="table">
+                                <h4>Table 3</h4>
+                            </label>
+                            <ul id="list3"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Bootstrap JS script -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios@0.24.0/dist/axios.min.js"></script>
+
+    <script>
+
+        // Define variables to hold references to the table lists
+        const parentElem1 = document.getElementById('list1');
+        const parentElem2 = document.getElementById('list2');
+        const parentElem3 = document.getElementById('list3');
+
+        // Fetch and display orders from the API
+        axios.get("https://crudcrud.com/api/140197c9bfea40568b02ee6bb2fa273f/orders")
+            .then((response) => {
+                for (let i = 0; i < response.data.length; i++) {
+                    showOrdersOnScreen(response.data[i]);
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+
+        function saveToDatabase(event) {
+            event.preventDefault();
+            const price = event.target.price.value;
+            const dish = event.target.dish.value;
+            const table = event.target.table.value;
+
+            const obj = { price, dish, table };
+
+            axios.post("https://crudcrud.com/api/140197c9bfea40568b02ee6bb2fa273f/orders", obj)
+                .then((response) => {
+                    showOrdersOnScreen(response.data);
+                })
+                .catch((err) => {
+                    console.log("Error saving to database", err);
+                });
+        }
+
+        function showOrdersOnScreen(obj) {
+
+            // Create a new list item element
+            const listElement = document.createElement('li');
+            listElement.className = "listyling";
+            listElement.classList.add("d-flex", "justify-content-between", "align-items-center");
+            console.log(listElement);
+
+            const childElem = document.createElement('span');
+            childElem.className = "spanitem";
+            childElem.textContent = obj.price + " Rupees for " + obj.dish;
+
+            // Create a delete button for removing orders
+            const deleteButton = document.createElement("button");
+            deleteButton.innerText = "Delete Order";
+            deleteButton.className = "btn btn-primary button";
+            deleteButton.onclick = () => {
+                
+                // Remove the order and the delete button from the list
+                listElement.removeChild(childElem);
+                listElement.removeChild(deleteButton);
+
+                // Delete the order from the API
+                axios.delete(`https://crudcrud.com/api/140197c9bfea40568b02ee6bb2fa273f/orders/${obj._id}`)
+                    .then(() => {
+                        console.log("Order deleted successfully");
+                    })
+                    .catch((err) => {
+                        console.log("Error deleting order:", err);
+                    });
+            };
+
+            listElement.appendChild(childElem);
+            listElement.appendChild(deleteButton);
+
+            // Determine the appropriate parent list for the order
+            const tableCategory = obj.table;
+            let parentElem;
+
+            if (tableCategory === "Table 1") {
+                parentElem = parentElem1;
+            } else if (tableCategory === "Table 2") {
+                parentElem = parentElem2;
+            } else if (tableCategory === "Table 3") {
+                parentElem = parentElem3;
+            }
+
+            // Append the order and delete button to the appropriate list
+            parentElem.appendChild(listElement);
+
+            document.getElementById("form").reset();
+        }
+    </script>
+</body>
+
+</html>

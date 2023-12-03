@@ -1,11 +1,11 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Restaurant Order Management Application</title>
+    <title>Restaurant Order Management page</title>
+
     <!-- Add Bootstrap CSS link -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
@@ -22,14 +22,17 @@
             height: 695px;
             width: 1095px;
             margin-top: 35px;
-            
+
         }
+
         h1 {
             margin-bottom: 70px;
         }
+
         .form-control {
             width: 70%;
         }
+
         label,
         h4,
         h1,
@@ -37,9 +40,11 @@
         li {
             color: white;
         }
+
         .formlabel {
             margin-left: 10px;
         }
+
         input {
             width: 50px;
             margin-left: 10px;
@@ -47,27 +52,33 @@
             height: 60%;
             margin-bottom: 15px;
         }
+
         .table,
         h2,
         h4,
         h1 {
             text-align: center;
         }
+
         .table {
             margin-top: 10px;
         }
+
         .item {
             border-bottom: 1px solid white;
         }
+
         .button {
             background-color: black;
             border: 2px solid gray;
         }
+
         .button:hover {
             background-color: gray;
             border: 2px solid black;
             color: black;
         }
+
         .heading {
             height: 7%;
             width: 60%;
@@ -77,6 +88,7 @@
             border-radius: 10px;
             margin-left: 6%;
         }
+
         .order {
             height: 8%;
             width: 40%;
@@ -85,43 +97,45 @@
             border-radius: 10px;
             margin-left: 30%;
             margin-bottom: 40px;
-            
+
         }
+
         .info {
             margin-top: 50px;
             margin-bottom: 30px;
             text-align: left;
-            margin-left: 35px;   
+            margin-left: 35px;
         }
+
         .submitbutton {
             margin-top: 20px;
         }
+
         .listyling {
             background-color: black;
             /* border: 3px solid gray; */
             border-radius: 10px;
             margin-bottom: 10px;
         }
+
         .spanitem {
             margin-bottom: 10px;
             margin-left: 10px;
-            
+
         }
-
-
     </style>
 </head>
 
 <body>
 
     <div class="container text-left">
-        <h1>Restaurant Orders page</h1>
+        <h1>Restaurent Order Tracker</h1>
         <div class="row justify-content-between">
             <!-- Form Section -->
             <div class="col-md-6">
                 <div class="mt-4 form">
 
-                        <h2 class="mt-4 heading">Enter Orders</h2>
+                    <h2 class="mt-4 heading">Enter Orders</h2>
 
                     <h4 class="info">Enter customer's choice dish:</h4>
                     <form id="form" onsubmit="saveToDatabase(event)">
@@ -151,7 +165,7 @@
             <!-- Orders List Section -->
             <div class="col-md-6">
                 <div class="mt-4 liItems">
-                        <h2 class="order">Orders List</h2>
+                    <h2 class="order">Orders List</h2>
                     <div class="row">
                         <div>
                             <label for="table1" class="table">
@@ -189,7 +203,7 @@
         const parentElem3 = document.getElementById('list3');
 
         // Fetch and display orders from the API
-        axios.get("https://crudcrud.com/api/140197c9bfea40568b02ee6bb2fa273f/orders")
+        axios.get("https://crudcrud.com/api/800ea7f7668f412c84c0dec91877bff2/orders")
             .then((response) => {
                 for (let i = 0; i < response.data.length; i++) {
                     showOrdersOnScreen(response.data[i]);
@@ -199,30 +213,35 @@
                 console.log(err);
             });
 
-        function saveToDatabase(event) {
+        async function saveToDatabase(event) {
             event.preventDefault();
-            const price = event.target.price.value;
+            var price = event.target.price.value;
             const dish = event.target.dish.value;
             const table = event.target.table.value;
 
-            const obj = { price, dish, table };
+            const obj = {
+                price,
+                dish,
+                table
+            };
 
-            axios.post("https://crudcrud.com/api/140197c9bfea40568b02ee6bb2fa273f/orders", obj)
-                .then((response) => {
-                    showOrdersOnScreen(response.data);
-                })
-                .catch((err) => {
-                    console.log("Error saving to database", err);
-                });
+            try {
+                const response = await axios.post("https://crudcrud.com/api/800ea7f7668f412c84c0dec91877bff2/orders", obj)
+                showOrdersOnScreen(response.data);
+            } catch (err) {
+                console.log("Error saving to database", err);
+            };
+
         }
-
+     
         function showOrdersOnScreen(obj) {
 
             // Create a new list item element
+            
             const listElement = document.createElement('li');
             listElement.className = "listyling";
             listElement.classList.add("d-flex", "justify-content-between", "align-items-center");
-            console.log(listElement);
+            // console.log(listElement);
 
             const childElem = document.createElement('span');
             childElem.className = "spanitem";
@@ -232,24 +251,25 @@
             const deleteButton = document.createElement("button");
             deleteButton.innerText = "Delete Order";
             deleteButton.className = "btn btn-primary button";
-            deleteButton.onclick = () => {
-                
+            deleteButton.onclick = async () => {
+
                 // Remove the order and the delete button from the list
                 listElement.removeChild(childElem);
                 listElement.removeChild(deleteButton);
 
                 // Delete the order from the API
-                axios.delete(`https://crudcrud.com/api/140197c9bfea40568b02ee6bb2fa273f/orders/${obj._id}`)
-                    .then(() => {
-                        console.log("Order deleted successfully");
-                    })
-                    .catch((err) => {
-                        console.log("Error deleting order:", err);
-                    });
+                try {
+                    const response = await axios.delete(`https://crudcrud.com/api/800ea7f7668f412c84c0dec91877bff2/orders/${obj._id}`);
+                    console.log("Order deleted successfully");
+                } catch (err) {
+                    console.log("Error deleting order:", err);
+                }
+
             };
 
             listElement.appendChild(childElem);
             listElement.appendChild(deleteButton);
+
 
             // Determine the appropriate parent list for the order
             const tableCategory = obj.table;
